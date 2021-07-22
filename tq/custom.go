@@ -86,8 +86,8 @@ type customAdapterTransferRequest struct {
 func NewCustomAdapterUploadRequest(oid string, size int64, path string, action *Action) *customAdapterTransferRequest {
 	return &customAdapterTransferRequest{"upload", oid, size, path, action}
 }
-func NewCustomAdapterDownloadRequest(oid string, size int64, action *Action) *customAdapterTransferRequest {
-	return &customAdapterTransferRequest{"download", oid, size, "", action}
+func NewCustomAdapterDownloadRequest(oid string, size int64, path string, action *Action) *customAdapterTransferRequest {
+	return &customAdapterTransferRequest{"download", oid, size, path, action}
 }
 
 type customAdapterTerminateRequest struct {
@@ -279,7 +279,7 @@ func (a *customAdapter) DoTransfer(ctx interface{}, t *Transfer, cb ProgressCall
 	if a.direction == Upload {
 		req = NewCustomAdapterUploadRequest(t.Oid, t.Size, t.Path, rel)
 	} else {
-		req = NewCustomAdapterDownloadRequest(t.Oid, t.Size, rel)
+		req = NewCustomAdapterDownloadRequest(t.Oid, t.Size, t.Path, rel)
 	}
 	if err = a.sendMessage(customCtx, req); err != nil {
 		return err
