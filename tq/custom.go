@@ -86,8 +86,8 @@ type customAdapterTransferRequest struct {
 func NewCustomAdapterUploadRequest(oid string, size int64, path string, action *Action) *customAdapterTransferRequest {
 	return &customAdapterTransferRequest{"upload", oid, size, path, action}
 }
-func NewCustomAdapterDownloadRequest(oid string, size int64, action *Action) *customAdapterTransferRequest {
-	return &customAdapterTransferRequest{"download", oid, size, "", action}
+func NewCustomAdapterDownloadRequest(oid string, size int64, path string, action *Action) *customAdapterTransferRequest {
+	return &customAdapterTransferRequest{"download", oid, size, path, action}
 }
 
 type customAdapterTerminateRequest struct {
@@ -231,7 +231,7 @@ func (a *customAdapter) shutdownWorkerProcess(ctx *customAdapterWorkerContext) e
 	select {
 	case err := <-finishChan:
 		return err
-	case <-time.After(30 * time.Second):
+	case <-time.After(3000 * time.Second):
 		return fmt.Errorf("timeout while shutting down worker process %d", ctx.workerNum)
 	}
 }
@@ -279,7 +279,7 @@ func (a *customAdapter) DoTransfer(ctx interface{}, t *Transfer, cb ProgressCall
 	if a.direction == Upload {
 		req = NewCustomAdapterUploadRequest(t.Oid, t.Size, t.Path, rel)
 	} else {
-		req = NewCustomAdapterDownloadRequest(t.Oid, t.Size, rel)
+		req = NewCustomAdapterDownloadRequest(t.Oid, t.Size, t.Name, rel)
 	}
 	if err = a.sendMessage(customCtx, req); err != nil {
 		return err

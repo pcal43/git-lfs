@@ -161,9 +161,9 @@ func (a *adapterBase) worker(workerNum int, ctx interface{}) {
 		a.authWait.Wait()
 		a.Trace("xfer: adapter %q worker %d auth signal received", a.Name(), workerNum)
 	}
-
 	for job := range a.jobChan {
 		t := job.T
+		tracerx.Printf("will download oid: %q ", t.Oid)
 
 		var authCallback func()
 		if signalAuthOnResponse {

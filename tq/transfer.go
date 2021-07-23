@@ -4,6 +4,7 @@ package tq
 
 import (
 	"fmt"
+	"github.com/rubyist/tracerx"
 	"time"
 
 	"github.com/git-lfs/git-lfs/errors"
@@ -86,6 +87,13 @@ func (e *ObjectError) Error() string {
 // newTransfer returns a copy of the given Transfer, with the name and path
 // values set.
 func newTransfer(tr *Transfer, name string, path string) *Transfer {
+	tracerx.Printf("tq: creating transfer adapter named %q from one named %q", name, tr.Name)
+//    if (name == "pom.xml") {
+//    	name = 	"app/main/core/ui-analytics-dashboard-components/pom.xml"
+//		tracerx.Printf("FIXED!")
+//	}
+
+	// debug.PrintStack()
 	t := &Transfer{
 		Name:          name,
 		Path:          path,

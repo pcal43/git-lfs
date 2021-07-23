@@ -1,3 +1,15 @@
+git-lfs (2.13.3+gimlet) stable; urgency=low
+
+  * New upstream version
+
+ -- Patrick Calahan <pcalahan@salesforce.com>  Thu, 22 Jul 2021 14:29:00 -0000
+
+git-lfs (2.13.3+git-sfdc) stable; urgency=low
+
+  * New upstream version
+
+ -- Patrick Calahan <pcalahan@salesforce.com>  Thu, 22 Jul 2021 14:29:00 -0000
+
 git-lfs (2.13.3) stable; urgency=low
 
   * New upstream version

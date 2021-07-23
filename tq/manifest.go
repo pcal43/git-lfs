@@ -96,6 +96,7 @@ func NewManifest(f *fs.Filesystem, apiClient *lfsapi.Client, operation, remote s
 		)
 		tusAllowed = git.Bool("lfs.tustransfers", false)
 		configureCustomAdapters(git, m)
+		configureP4Adapter(git, m)
 	}
 
 	if m.maxRetries < 1 {

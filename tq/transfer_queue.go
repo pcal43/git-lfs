@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	defaultBatchSize = 100
+	defaultBatchSize = 3
 	baseRetryDelayMs = 250
 )
 
@@ -129,7 +129,7 @@ func (b batch) Concat(other batch, size int) (left, right batch, minWait time.Du
 func (b batch) ToTransfers() []*Transfer {
 	transfers := make([]*Transfer, 0, len(b))
 	for _, t := range b {
-		transfers = append(transfers, &Transfer{Oid: t.Oid, Size: t.Size, Missing: t.Missing})
+		transfers = append(transfers, &Transfer{Name: t.Name, Oid: t.Oid, Size: t.Size, Missing: t.Missing})
 	}
 	return transfers
 }
