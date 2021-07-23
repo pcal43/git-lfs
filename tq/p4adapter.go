@@ -101,6 +101,29 @@ func (a *p4Adapter) DoTransfer(ctx interface{}, t *Transfer, cb ProgressCallback
 }
 
 
+// worker function, many of these run per adapter
+func (a *p4Adapter) worker(workerNum int, ctx interface{}) {
+	a.Trace("xfer: adapter %q worker %d starting", a.Name(), workerNum)
+	p4Ctx, ok := ctx.(*p4AdapterWorkerContext)
+	if !ok {
+		fmt.Errorf("context object for custom transfer %q was of the wrong type", a.name)
+		a.transferImpl.WorkerEnding(workerNum, ctx)
+		a.workerWait.Done()
+		return
+	}
+
+	for job := range a.jobChan {
+		t := job.T
+		tracerx.Printf("$$$$$$ P4ADAPTER [%d] DOWNLOAD %q %q", p4Ctx.workerNum, t.Oid, t.Name)
+	}
+	tracerx.Printf("$$$$$$ P4ADAPTER [%d] P4 SYNC NOW", p4Ctx.workerNum)
+	for job := range a.jobChan {
+		job.Done(nil)
+	}
+	tracerx.Printf("$$$$$$ P4ADAPTER [%d] DONE", p4Ctx.workerNum)
+	a.transferImpl.WorkerEnding(workerNum, ctx)
+	a.workerWait.Done()
+}
 
 type p4AdapterConfig struct {
 	AdapterConfig
