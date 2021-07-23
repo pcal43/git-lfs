@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	defaultBatchSize = 4
+	defaultBatchSize = 400000
 	baseRetryDelayMs = 250
 )
 
