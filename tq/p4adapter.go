@@ -62,8 +62,29 @@ func newP4Adapter(f *fs.Filesystem, name string, dir Direction, path string, arg
 
 func (a *p4Adapter) Begin(cfg AdapterConfig, cb ProgressCallback) error {
 	tracerx.Printf("======== P4ADAPTER BEGIN")
+	a.apiClient = cfg.APIClient()
+	a.remote = cfg.Remote()
+	a.cb = cb
+	a.jobChan = make(chan *job, 100)
+	a.debugging = a.apiClient.OSEnv().Bool("GIT_TRANSFER_TRACE", false) ||
+		a.apiClient.OSEnv().Bool("GIT_CURL_VERBOSE", false)
+	maxConcurrency := cfg.ConcurrentTransfers()
+
+	a.Trace("xfer: adapter %q Begin() with %d workers", a.Name(), maxConcurrency)
+
+	a.workerWait.Add(maxConcurrency)
+	a.authWait.Add(1)
+	for i := 0; i < maxConcurrency; i++ {
+		ctx, err := a.transferImpl.WorkerStarting(i)
+		if err != nil {
+			return err
+		}
+		go a.worker(i, ctx)
+	}
+	a.Trace("xfer: adapter %q started", a.Name())
+	return nil
 	// If config says not to launch multiple processes, downgrade incoming value
-	return a.adapterBase.Begin(&p4AdapterConfig{AdapterConfig: cfg}, cb)
+	//return a.adapterBase.Begin(&p4AdapterConfig{AdapterConfig: cfg}, cb)
 }
 
 func (a *p4Adapter) Add(transfers ...*Transfer) <-chan TransferResult {
@@ -102,7 +123,6 @@ func (a *p4Adapter) DoTransfer(ctx interface{}, t *Transfer, cb ProgressCallback
 
 // worker function, many of these run per adapter
 func (a *p4Adapter) worker(workerNum int, ctx interface{}) {
-
 	a.Trace("xfer: adapter %q worker %d starting", a.Name(), workerNum)
 	p4Ctx, ok := ctx.(*p4AdapterWorkerContext)
 	if !ok {
