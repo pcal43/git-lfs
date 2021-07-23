@@ -100,9 +100,9 @@ func (a *p4Adapter) DoTransfer(ctx interface{}, t *Transfer, cb ProgressCallback
 	return nil
 }
 
-
 // worker function, many of these run per adapter
 func (a *p4Adapter) worker(workerNum int, ctx interface{}) {
+
 	a.Trace("xfer: adapter %q worker %d starting", a.Name(), workerNum)
 	p4Ctx, ok := ctx.(*p4AdapterWorkerContext)
 	if !ok {
@@ -111,6 +111,7 @@ func (a *p4Adapter) worker(workerNum int, ctx interface{}) {
 		a.workerWait.Done()
 		return
 	}
+	tracerx.Printf("$$$$$$ P4ADAPTER [%d] WORKER", p4Ctx.workerNum)
 
 	for job := range a.jobChan {
 		t := job.T
